@@ -1,0 +1,57 @@
+### Реєстрація
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "test@test.com",
+  "password": "123456",
+  "firstName": "Іван",
+  "lastName": "Петренко",
+  "role": "JOB_SEEKER"
+}
+
+### Логін
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@test.com",
+  "password": "123456"
+}
+
+### Створити роботодавця
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "employer@test.com",
+  "password": "123456",
+  "firstName": "Олег",
+  "lastName": "Роботодавець",
+  "role": "EMPLOYER"
+}
+
+### Логін роботодавця (скопіюй token з відповіді!)
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "employer@test.com",
+  "password": "123456"
+}
+
+### Створити вакансію (встав свій token замість YOUR_TOKEN)
+POST http://localhost:8080/api/vacancies
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkpPQl9TRUVLRVIiLCJpYXQiOjE3ODA1ODYwMzgsImV4cCI6MTc4MDY3MjQzOH0.GIEXFpdKdvSrEnW3qUeivuOUtD1csFF5eRDJas_WJ3pQHTwNAaR16jz0ZYoFlTKO
+
+{
+  "title": "Junior Kotlin Developer",
+  "description": "Шукаємо молодого розробника для роботи над цікавими проєктами",
+  "company": "Tech UA",
+  "location": "Київ",
+  "salary": "1000-1500$"
+}
+
+### Отримати всі вакансії
+GET http://localhost:8080/api/vacancies

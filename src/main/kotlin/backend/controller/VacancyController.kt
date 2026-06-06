@@ -1,0 +1,65 @@
+package backend.controller
+
+import backend.dto.CreateVacancyRequest
+import backend.service.VacancyService
+import org.springframework.http.ResponseEntity
+import org.springframework.security.core.Authentication
+import org.springframework.web.bind.annotation.*
+
+@RestController
+@RequestMapping("/api/vacancies")
+@CrossOrigin(origins = ["http://localhost:5173"])
+class VacancyController(private val vacancyService: VacancyService) {
+
+    @GetMapping
+    fun getAllVacancies(): ResponseEntity<Any> {
+        return try {
+            ResponseEntity.ok(vacancyService.getAllVacancies())
+        } catch (e: RuntimeException) {
+            ResponseEntity.badRequest().body(mapOf("error" to e.message))
+        }
+    }
+
+    @GetMapping("/{id}")
+    fun getVacancyById(@PathVariable id: Long): ResponseEntity<Any> {
+        return try {
+            ResponseEntity.ok(vacancyService.getVacancyById(id))
+        } catch (e: RuntimeException) {
+            ResponseEntity.badRequest().body(mapOf("error" to e.message))
+        }
+    }
+
+    @GetMapping("/search")
+    fun searchVacancies(@RequestParam query: String): ResponseEntity<Any> {
+        return try {
+            ResponseEntity.ok(vacancyService.searchVacancies(query))
+        } catch (e: RuntimeException) {
+            ResponseEntity.badRequest().body(mapOf("error" to e.message))
+        }
+    }
+
+    @PostMapping
+    fun createVacancy(
+        @RequestBody request: CreateVacancyRequest,
+        authentication: Authentication
+    ): ResponseEntity<Any> {
+        return try {
+            ResponseEntity.ok(vacancyService.createVacancy(request, authentication.name))
+        } catch (e: RuntimeException) {
+            ResponseEntity.badRequest().body(mapOf("error" to e.message))
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    fun deleteVacancy(
+        @PathVariable id: Long,
+        authentication: Authentication
+    ): ResponseEntity<Any> {
+        return try {
+            vacancyService.deleteVacancy(id, authentication.name)
+            ResponseEntity.ok(mapOf("message" to "Вакансію видалено"))
+        } catch (e: RuntimeException) {
+            ResponseEntity.badRequest().body(mapOf("error" to e.message))
+        }
+    }
+}
