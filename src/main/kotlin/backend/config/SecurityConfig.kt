@@ -31,14 +31,24 @@ class SecurityConfig(private val jwtFilter: JwtAuthFilter) {
             .sessionManagement {
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             }
-            .authorizeHttpRequests {
-                it.requestMatchers("/api/auth/**").permitAll()
-                it.requestMatchers("/api/vacancies/**").permitAll()
-                it.requestMatchers("/api/applications/**").permitAll()
-                it.requestMatchers("/api/profile/**").permitAll()
-                it.requestMatchers("/api/recommendations/**").permitAll()
-                it.requestMatchers("/api/admin/**").hasRole("ADMIN")
-                it.anyRequest().authenticated()
+            .authorizeHttpRequests { auth ->
+                auth.requestMatchers("/api/auth/**").permitAll()
+                auth.requestMatchers(org.springframework.http.HttpMethod.GET, "/api/vacancies", "/api/vacancies/**").permitAll()
+
+                auth.requestMatchers("/api/recommendations/**").hasRole("JOB_SEEKER")
+                auth.requestMatchers(org.springframework.http.HttpMethod.POST, "/api/vacancies/*/applications").hasRole("JOB_SEEKER")
+                auth.requestMatchers(org.springframework.http.HttpMethod.GET, "/api/applications/my").hasRole("JOB_SEEKER")
+
+                auth.requestMatchers(org.springframework.http.HttpMethod.POST, "/api/vacancies").hasRole("EMPLOYER")
+                auth.requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/vacancies/**").hasRole("EMPLOYER")
+                auth.requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/vacancies/**").hasRole("EMPLOYER")
+                auth.requestMatchers(org.springframework.http.HttpMethod.GET, "/api/vacancies/*/applications").hasRole("EMPLOYER")
+
+                auth.requestMatchers("/api/profile/**").hasAnyRole("JOB_SEEKER", "EMPLOYER")
+
+                auth.requestMatchers("/api/admin/**").hasRole("ADMIN")
+
+                auth.anyRequest().authenticated()
             }
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter::class.java)
         return http.build()

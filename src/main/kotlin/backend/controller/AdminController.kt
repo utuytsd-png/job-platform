@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/admin")
-@CrossOrigin(origins = ["http://localhost:5173"])
 class AdminController(
     private val userRepository: UserRepository,
     private val vacancyRepository: JobVacancyRepository
