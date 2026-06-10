@@ -33,6 +33,7 @@ data class JobApplication(
     val appliedAt: LocalDateTime = LocalDateTime.now()
 )
 
+
 enum class ApplicationStatus {
     PENDING,    // очікує розгляду
     REVIEWED,   // переглянуто

@@ -36,6 +36,8 @@ class SecurityConfig(private val jwtFilter: JwtAuthFilter) {
                 it.requestMatchers("/api/vacancies/**").permitAll()
                 it.requestMatchers("/api/applications/**").permitAll()
                 it.requestMatchers("/api/profile/**").permitAll()
+                it.requestMatchers("/api/recommendations/**").permitAll()
+                it.requestMatchers("/api/admin/**").hasRole("ADMIN")
                 it.anyRequest().authenticated()
             }
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter::class.java)
