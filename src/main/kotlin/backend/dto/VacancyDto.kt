@@ -7,7 +7,8 @@ data class CreateVacancyRequest(
     val description: String,
     val company: String,
     val location: String,
-    val salary: String = ""
+    val salary: String = "",
+    val employmentType: String = ""
 )
 
 data class VacancyResponse(
@@ -21,5 +22,6 @@ data class VacancyResponse(
     val employerLastName: String,
     val employerEmail: String,
     val createdAt: LocalDateTime,
-    val isActive: Boolean
+    val isActive: Boolean,
+    val employmentType: String
 )

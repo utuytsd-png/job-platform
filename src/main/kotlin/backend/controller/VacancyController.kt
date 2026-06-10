@@ -49,6 +49,29 @@ class VacancyController(private val vacancyService: VacancyService) {
             ResponseEntity.badRequest().body(mapOf("error" to e.message))
         }
     }
+    @PutMapping("/{id}")
+    fun updateVacancy(
+        @PathVariable id: Long,
+        @RequestBody request: CreateVacancyRequest,
+        authentication: Authentication
+    ): ResponseEntity<Any> {
+        return try {
+            ResponseEntity.ok(vacancyService.updateVacancy(id, request, authentication.name))
+        } catch (e: RuntimeException) {
+            ResponseEntity.badRequest().body(mapOf("error" to e.message))
+        }
+    }
+    @GetMapping("/filter")
+    fun filterVacancies(
+        @RequestParam(required = false) location: String?,
+        @RequestParam(required = false) employmentType: String?
+    ): ResponseEntity<Any> {
+        return try {
+            ResponseEntity.ok(vacancyService.filterVacancies(location, employmentType))
+        } catch (e: RuntimeException) {
+            ResponseEntity.badRequest().body(mapOf("error" to e.message))
+        }
+    }
 
     @DeleteMapping("/{id}")
     fun deleteVacancy(

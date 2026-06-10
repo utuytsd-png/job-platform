@@ -3,6 +3,9 @@ package backend.model
 import jakarta.persistence.*
 import java.time.LocalDateTime
 
+import org.hibernate.annotations.OnDelete
+import org.hibernate.annotations.OnDeleteAction
+
 @Entity
 @Table(name = "job_applications")
 data class JobApplication(
@@ -10,9 +13,10 @@ data class JobApplication(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vacancy_id", nullable = false)
-    val vacancy: JobVacancy = JobVacancy(),
+    @ManyToOne
+    @JoinColumn(name = "vacancy_id", nullable = false, foreignKey = ForeignKey(name = "fk_application_vacancy"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    val vacancy: JobVacancy,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "applicant_id", nullable = false)

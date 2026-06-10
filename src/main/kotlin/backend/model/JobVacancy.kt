@@ -8,29 +8,30 @@ import java.time.LocalDateTime
 data class JobVacancy(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    var id: Long = 0,
 
     @Column(nullable = false)
-    val title: String = "",
+    var title: String = "",
 
     @Column(nullable = false, length = 5000)
-    val description: String = "",
+    var description: String = "",
 
     @Column(nullable = false)
-    val company: String = "",
+    var company: String = "",
 
     @Column(nullable = false)
-    val location: String = "",
+    var location: String = "",
 
-    val salary: String = "",
+    var salary: String = "",
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employer_id", nullable = false)
-    val employer: User = User(),
+    var employer: User = User(),
 
     @Column(nullable = false)
-    val createdAt: LocalDateTime = LocalDateTime.now(),
+    var createdAt: LocalDateTime = LocalDateTime.now(),
 
     @Column(nullable = false)
-    val isActive: Boolean = true
+    var isActive: Boolean = true,
+    var employmentType: String = ""
 )

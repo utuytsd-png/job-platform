@@ -16,10 +16,10 @@ data class User(
     val password: String = "",
 
     @Column(nullable = false)
-    val firstName: String = "",
+    var firstName: String = "",
 
     @Column(nullable = false)
-    val lastName: String = "",
+    var lastName: String = "",
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

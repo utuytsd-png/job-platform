@@ -6,11 +6,15 @@ import backend.model.JobVacancy
 import backend.repository.JobVacancyRepository
 import backend.repository.UserRepository
 import org.springframework.stereotype.Service
+import backend.repository.JobApplicationRepository
+import org.springframework.transaction.annotation.Transactional
+
 
 @Service
 class VacancyService(
     private val vacancyRepository: JobVacancyRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val applicationRepository: JobApplicationRepository
 ) {
     fun getAllVacancies(): List<VacancyResponse> {
         return vacancyRepository.findAllByIsActiveTrue().map { it.toResponse() }
@@ -32,13 +36,36 @@ class VacancyService(
             company = request.company,
             location = request.location,
             salary = request.salary,
-            employer = employer
+            employer = employer,
+            employmentType = request.employmentType
         )
 
         return vacancyRepository.save(vacancy).toResponse()
     }
 
+    @Transactional
     fun deleteVacancy(id: Long, employerEmail: String) {
+        println("=== DELETE DEBUG ===")
+        println("employerEmail from auth: '$employerEmail'")
+
+        val vacancy = vacancyRepository.findById(id)
+            .orElseThrow { RuntimeException("Вакансію не знайдено") }
+
+        println("vacancy.employer.email: '${vacancy.employer.email}'")
+        println("match: ${vacancy.employer.email == employerEmail}")
+
+        if (vacancy.employer.email != employerEmail) {
+            throw RuntimeException("Немає доступу")
+        }
+
+        applicationRepository.deleteAllByVacancyId(id)
+        vacancyRepository.delete(vacancy)
+    }
+
+    fun searchVacancies(query: String): List<VacancyResponse> {
+        return vacancyRepository.findAllByTitleContainingIgnoreCase(query).map { it.toResponse() }
+    }
+    fun updateVacancy(id: Long, request: CreateVacancyRequest, employerEmail: String): VacancyResponse {
         val vacancy = vacancyRepository.findById(id)
             .orElseThrow { RuntimeException("Вакансію не знайдено") }
 
@@ -46,11 +73,20 @@ class VacancyService(
             throw RuntimeException("Немає доступу")
         }
 
-        vacancyRepository.delete(vacancy)
-    }
+        vacancy.title = request.title
+        vacancy.description = request.description
+        vacancy.company = request.company
+        vacancy.location = request.location
+        vacancy.salary = request.salary
+        vacancy.employmentType = request.employmentType
 
-    fun searchVacancies(query: String): List<VacancyResponse> {
-        return vacancyRepository.findAllByTitleContainingIgnoreCase(query).map { it.toResponse() }
+        return vacancyRepository.save(vacancy).toResponse()
+    }
+    fun filterVacancies(location: String?, employmentType: String?): List<VacancyResponse> {
+        return vacancyRepository.findWithFilters(
+            location ?: "",
+            employmentType ?: ""
+        ).map { it.toResponse() }
     }
 
     private fun JobVacancy.toResponse() = VacancyResponse(
@@ -64,6 +100,7 @@ class VacancyService(
         employerLastName = employer.lastName,
         employerEmail = employer.email,
         createdAt = createdAt,
-        isActive = isActive
+        isActive = isActive,
+        employmentType = employmentType ?: ""
     )
 }

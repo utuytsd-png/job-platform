@@ -20,3 +20,24 @@ data class AuthResponse(
     val lastName: String,
     val role: String
 )
+
+data class UserProfileResponse(
+    val userId: Long,
+    val firstName: String,
+    val lastName: String,
+    val email: String,
+    val role: String,
+    val skills: String,
+    val experience: String,
+    val education: String,
+    val resumeText: String
+)
+
+data class UpdateProfileRequest(
+    val firstName: String,
+    val lastName: String,
+    val skills: String,
+    val experience: String,
+    val education: String,
+    val resumeText: String
+)
