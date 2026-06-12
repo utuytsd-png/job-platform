@@ -8,7 +8,8 @@ data class CreateVacancyRequest(
     val company: String,
     val location: String,
     val salary: String = "",
-    val employmentType: String = ""
+    val employmentType: String = "",
+    val requiredSkills: String = ""
 )
 
 data class VacancyResponse(
@@ -18,6 +19,7 @@ data class VacancyResponse(
     val company: String,
     val location: String,
     val salary: String,
+    val requiredSkills: String,
     val employerFirstName: String,
     val employerLastName: String,
     val employerEmail: String,

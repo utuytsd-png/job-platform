@@ -1,6 +1,5 @@
 package backend.service
 
-import backend.dto.VacancyResponse
 import backend.repository.JobVacancyRepository
 import backend.repository.UserProfileRepository
 import backend.repository.UserRepository
@@ -19,29 +18,41 @@ class RecommendationService(
         val profile = profileRepository.findByUserId(user.id)
             .orElse(null)
 
-        // Якщо профіль порожній — повертаємо всі вакансії з 0%
         val skillsRaw = profile?.skills ?: ""
-        val skills = skillsRaw
+        if (skillsRaw.isBlank()) {
+            return emptyList()
+        }
+
+        val userSkills = skillsRaw
             .split(",")
             .map { it.trim().lowercase() }
             .filter { it.isNotEmpty() }
+            .toSet()
 
         val vacancies = vacancyRepository.findAllByIsActiveTrue()
 
         return vacancies
             .map { vacancy ->
-                val text = "${vacancy.title} ${vacancy.description}".lowercase()
-                val matchedSkills = skills.filter { skill -> text.contains(skill) }
-                val score = if (skills.isEmpty()) 0
-                else (matchedSkills.size * 100) / skills.size
+                // ДОБАВЛЕНО ?: "" для защиты от null
+                val vacancySkills = (vacancy.requiredSkills ?: "")
+                    .split(",")
+                    .map { it.trim().lowercase() }
+                    .filter { it.isNotEmpty() }
+                    .toSet()
+
+                val matchedSkills = userSkills.intersect(vacancySkills).toList()
+
+                val score = if (vacancySkills.isEmpty()) 0
+                else (matchedSkills.size * 100) / vacancySkills.size
 
                 RecommendedVacancy(
                     id = vacancy.id,
                     title = vacancy.title,
                     company = vacancy.company,
                     location = vacancy.location,
-                    salary = vacancy.salary,
-                    employmentType = vacancy.employmentType,
+                    // ДОБАВЛЕНО ?: "" для защиты от null
+                    salary = vacancy.salary ?: "",
+                    employmentType = vacancy.employmentType ?: "",
                     description = vacancy.description,
                     employerFirstName = vacancy.employer.firstName,
                     employerLastName = vacancy.employer.lastName,
@@ -51,7 +62,7 @@ class RecommendationService(
                     matchedSkills = matchedSkills
                 )
             }
-            .filter { it.matchScore > 0 }   // тільки де є збіг
+            .filter { it.matchScore > 0 }
             .sortedByDescending { it.matchScore }
     }
 }

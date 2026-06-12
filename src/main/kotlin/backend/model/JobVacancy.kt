@@ -22,7 +22,10 @@ data class JobVacancy(
     @Column(nullable = false)
     var location: String = "",
 
-    var salary: String = "",
+    var salary: String? = "",
+
+    // Добавили ?
+    var requiredSkills: String? = "",
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employer_id", nullable = false)
@@ -33,5 +36,7 @@ data class JobVacancy(
 
     @Column(nullable = false)
     var isActive: Boolean = true,
-    var employmentType: String = ""
+
+    // Добавили ?
+    var employmentType: String? = ""
 )

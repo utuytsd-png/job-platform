@@ -3,12 +3,11 @@ package backend.service
 import backend.dto.CreateVacancyRequest
 import backend.dto.VacancyResponse
 import backend.model.JobVacancy
+import backend.repository.JobApplicationRepository
 import backend.repository.JobVacancyRepository
 import backend.repository.UserRepository
 import org.springframework.stereotype.Service
-import backend.repository.JobApplicationRepository
 import org.springframework.transaction.annotation.Transactional
-
 
 @Service
 class VacancyService(
@@ -36,6 +35,7 @@ class VacancyService(
             company = request.company,
             location = request.location,
             salary = request.salary,
+            requiredSkills = request.requiredSkills,
             employer = employer,
             employmentType = request.employmentType
         )
@@ -45,14 +45,8 @@ class VacancyService(
 
     @Transactional
     fun deleteVacancy(id: Long, employerEmail: String) {
-        println("=== DELETE DEBUG ===")
-        println("employerEmail from auth: '$employerEmail'")
-
         val vacancy = vacancyRepository.findById(id)
             .orElseThrow { RuntimeException("Вакансію не знайдено") }
-
-        println("vacancy.employer.email: '${vacancy.employer.email}'")
-        println("match: ${vacancy.employer.email == employerEmail}")
 
         if (vacancy.employer.email != employerEmail) {
             throw RuntimeException("Немає доступу")
@@ -65,6 +59,7 @@ class VacancyService(
     fun searchVacancies(query: String): List<VacancyResponse> {
         return vacancyRepository.findAllByTitleContainingIgnoreCase(query).map { it.toResponse() }
     }
+
     fun updateVacancy(id: Long, request: CreateVacancyRequest, employerEmail: String): VacancyResponse {
         val vacancy = vacancyRepository.findById(id)
             .orElseThrow { RuntimeException("Вакансію не знайдено") }
@@ -79,9 +74,11 @@ class VacancyService(
         vacancy.location = request.location
         vacancy.salary = request.salary
         vacancy.employmentType = request.employmentType
+        vacancy.requiredSkills = request.requiredSkills
 
         return vacancyRepository.save(vacancy).toResponse()
     }
+
     fun filterVacancies(location: String?, employmentType: String?): List<VacancyResponse> {
         return vacancyRepository.findWithFilters(
             location ?: "",
@@ -95,12 +92,15 @@ class VacancyService(
         description = description,
         company = company,
         location = location,
-        salary = salary,
+        // ДОБАВЛЯЕМ ?: "" ЗДЕСЬ
+        salary = salary ?: "",
+        requiredSkills = requiredSkills ?: "",
         employerFirstName = employer.firstName,
         employerLastName = employer.lastName,
         employerEmail = employer.email,
         createdAt = createdAt,
         isActive = isActive,
+        // И ЗДЕСЬ
         employmentType = employmentType ?: ""
     )
 }
